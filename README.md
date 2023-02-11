@@ -1,5 +1,5 @@
 # asp-net-template
-<h1>ASP.NET Template</h1>
+<i>This is for future reference for how to set up an ASP.NET project</i>
 
 <h2>Command to enable EF Core in CLI:</h2>
 <p>dotnet tool install --global dotnet-ef</p>
