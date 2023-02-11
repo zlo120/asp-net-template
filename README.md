@@ -1,5 +1,5 @@
 # asp-net-template
-<h1>For future reference of how I should formate an ASP.NET API</h1>
+<h1>ASP.NET Template</h1>
 
 <h2>Command to enable EF Core in CLI:</h2>
 <p>dotnet tool install --global dotnet-ef</p>
