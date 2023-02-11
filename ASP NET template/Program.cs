@@ -11,8 +11,14 @@ builder.Services.AddDbContext<Context>(options => options.UseSqlServer(builder.C
 
 builder.Services.AddTransient<ISecurityService, SecurityService>();
 builder.Services.AddTransient<ISecurityRepository, SecurityRepository>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IUserRepository, UserRepository>();
+builder.Services.AddTransient<IProductService, ProductService>();
+builder.Services.AddTransient<IProductRepository, ProductRepository>();
+builder.Services.AddTransient<IStoreService, StoreService>();
+builder.Services.AddTransient<IStoreRepository, StoreRepository>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddCors();
 

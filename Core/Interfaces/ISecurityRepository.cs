@@ -4,7 +4,7 @@ namespace Core.Interfaces
 {
     public interface ISecurityRepository
     {
-        Task Create(Security usersSecuredData);
+        Task<bool> Create(Security usersSecuredData);
         Task<Security> GetByUserEmail(string email);
         Task<Security> GetByUserId(int id);
         Task<bool> Update(Security usersSecuredData);

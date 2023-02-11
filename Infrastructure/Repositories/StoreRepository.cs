@@ -5,20 +5,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories
 {
-    public class SecurityRepository : ISecurityRepository
+    public class StoreRepository : IStoreRepository
     {
         private readonly Context _context;
-
-        private readonly ILogger<SecurityRepository> _logger;
-        public SecurityRepository(Context context, ILogger<SecurityRepository> logger)
+        private readonly ILogger<StoreRepository> _logger;
+        public StoreRepository(ILogger<StoreRepository> logger, Context context)
         {
-            _context = context;
-            _logger = logger;
+            _context= context;
+            _logger= logger;
         }
-
-        public async Task<bool> Create(Security usersSecuredData)
+        public async Task<bool> Create(Store store)
         {
-            _context.Securities.Add(usersSecuredData);
+            _context.Stores.Add(store);
             try
             {
                 await _context.SaveChangesAsync();
@@ -31,30 +29,24 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<Security> GetByUserEmail(string email)
+        public async Task<Store> GetStoreById(int id)
         {
-            return await _context.Securities.Where(s => s.User.Email == email).FirstOrDefaultAsync();
+            return await _context.Stores.Where(s => s.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<Security> GetByUserId(int id)
+        public async Task<bool> UpdateStore(Store store)
         {
-            return await _context.Securities.Where(s => s.User.Id == id).FirstOrDefaultAsync();
-        }
-
-        public async Task<bool> Update(Security usersSecuredData)
-        {
-            var security = await _context.Securities.Where(s => s.Id == usersSecuredData.Id).FirstOrDefaultAsync();
-            if (security is null)
+            var originalStore = await _context.Stores.Where(s => s.Id == store.Id).FirstOrDefaultAsync();
+            if (originalStore is null)
             {
                 return false;
             }
 
-            security.User = usersSecuredData.User;
-            security.UserId = usersSecuredData.UserId;
-            security.Salt = usersSecuredData.Salt;
-            security.HashedPassword = usersSecuredData.HashedPassword;
+            originalStore.Name = store.Name;
+            originalStore.Products = store.Products;
+            originalStore.Users = store.Users;
 
-            _context.Securities.Update(security);
+            _context.Stores.Update(originalStore);
 
             try
             {
@@ -68,15 +60,15 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> DeleteByUserId(int id)
+        public async Task<bool> DeleteStore(int id)
         {
-            var security = await GetByUserId(id);
-            if (security is null)
+            var store = await _context.Stores.Where(s => s.Id == id).FirstOrDefaultAsync();
+            if (store is null)
             {
                 return false;
             }
 
-            _context.Securities.Remove(security);
+            _context.Stores.Remove(store);
 
             try
             {

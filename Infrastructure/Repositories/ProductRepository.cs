@@ -5,20 +5,20 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories
 {
-    public class SecurityRepository : ISecurityRepository
+    public class ProductRepository : IProductRepository
     {
         private readonly Context _context;
+        private readonly ILogger<ProductRepository> _logger;
 
-        private readonly ILogger<SecurityRepository> _logger;
-        public SecurityRepository(Context context, ILogger<SecurityRepository> logger)
+        public ProductRepository(ILogger<ProductRepository> logger, Context context)
         {
-            _context = context;
-            _logger = logger;
+            _context= context;
+            _logger= logger;
         }
 
-        public async Task<bool> Create(Security usersSecuredData)
+        public async Task<bool> Create(Product product)
         {
-            _context.Securities.Add(usersSecuredData);
+            _context.Products.Add(product);
             try
             {
                 await _context.SaveChangesAsync();
@@ -31,30 +31,29 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<Security> GetByUserEmail(string email)
+        public async Task<Product> GetProductById(int id)
         {
-            return await _context.Securities.Where(s => s.User.Email == email).FirstOrDefaultAsync();
+            return await _context.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<Security> GetByUserId(int id)
+        public async Task<bool> UpdateProduct(Product product)
         {
-            return await _context.Securities.Where(s => s.User.Id == id).FirstOrDefaultAsync();
-        }
-
-        public async Task<bool> Update(Security usersSecuredData)
-        {
-            var security = await _context.Securities.Where(s => s.Id == usersSecuredData.Id).FirstOrDefaultAsync();
-            if (security is null)
+            var originalProduct = await _context.Products.Where(p => p.Id == product.Id).FirstOrDefaultAsync();
+            if (originalProduct is null)
             {
                 return false;
             }
 
-            security.User = usersSecuredData.User;
-            security.UserId = usersSecuredData.UserId;
-            security.Salt = usersSecuredData.Salt;
-            security.HashedPassword = usersSecuredData.HashedPassword;
+            originalProduct.Id = product.Id;
+            originalProduct.Name = product.Name;
+            originalProduct.Description= product.Description;
+            originalProduct.Price = product.Price;
+            originalProduct.User = product.User;
+            originalProduct.UserId = product.UserId;
+            originalProduct.Store = product.Store;
+            originalProduct.StoreId = product.StoreId;
 
-            _context.Securities.Update(security);
+            _context.Products.Update(originalProduct);
 
             try
             {
@@ -68,16 +67,15 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> DeleteByUserId(int id)
+        public async Task<bool> DeleteProduct(int id)
         {
-            var security = await GetByUserId(id);
-            if (security is null)
+            var product = await _context.Products.Where(p => p.Id == id).FirstOrDefaultAsync();
+            if (product is null)
             {
                 return false;
             }
 
-            _context.Securities.Remove(security);
-
+            _context.Products.Remove(product);
             try
             {
                 await _context.SaveChangesAsync();

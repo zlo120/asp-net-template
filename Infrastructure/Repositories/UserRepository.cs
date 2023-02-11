@@ -5,20 +5,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories
 {
-    public class SecurityRepository : ISecurityRepository
+    public class UserRepository : IUserRepository
     {
         private readonly Context _context;
-
-        private readonly ILogger<SecurityRepository> _logger;
-        public SecurityRepository(Context context, ILogger<SecurityRepository> logger)
+        private readonly ILogger<UserRepository> _logger;
+        public UserRepository(Context context, ILogger<UserRepository> logger)
         {
             _context = context;
             _logger = logger;
         }
-
-        public async Task<bool> Create(Security usersSecuredData)
+        
+        public async Task<bool> Create(User user)
         {
-            _context.Securities.Add(usersSecuredData);
+            _context.Users.Add(user);
             try
             {
                 await _context.SaveChangesAsync();
@@ -31,30 +30,29 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<Security> GetByUserEmail(string email)
+        public async Task<User> GetUserByEmail(string email)
         {
-            return await _context.Securities.Where(s => s.User.Email == email).FirstOrDefaultAsync();
+            return await _context.Users.Where(u => u.Email == email).FirstOrDefaultAsync();
         }
 
-        public async Task<Security> GetByUserId(int id)
+        public async Task<User> GetUserById(int id)
         {
-            return await _context.Securities.Where(s => s.User.Id == id).FirstOrDefaultAsync();
+            return await _context.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<bool> Update(Security usersSecuredData)
+        public async Task<bool> UpdateUser(User user)
         {
-            var security = await _context.Securities.Where(s => s.Id == usersSecuredData.Id).FirstOrDefaultAsync();
-            if (security is null)
+            var originalUser = await _context.Users.Where(u => u.Id == user.Id).FirstOrDefaultAsync();
+            if (originalUser is null)
             {
                 return false;
             }
 
-            security.User = usersSecuredData.User;
-            security.UserId = usersSecuredData.UserId;
-            security.Salt = usersSecuredData.Salt;
-            security.HashedPassword = usersSecuredData.HashedPassword;
+            originalUser.FirstName = user.FirstName;
+            originalUser.LastName = user.LastName;
+            originalUser.Email = user.Email;
 
-            _context.Securities.Update(security);
+            _context.Update(originalUser);
 
             try
             {
@@ -68,15 +66,16 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> DeleteByUserId(int id)
+        public async Task<bool> DeleteUser(int id)
         {
-            var security = await GetByUserId(id);
-            if (security is null)
+            var originalUser = await _context.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
+            
+            if (originalUser is null)
             {
                 return false;
             }
 
-            _context.Securities.Remove(security);
+            _context.Users.Remove(originalUser);
 
             try
             {

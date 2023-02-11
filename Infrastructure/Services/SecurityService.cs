@@ -48,7 +48,7 @@ namespace Infrastructure.Services
             return await _securityRepository.GetByUserId(id);
         }
 
-        public async Task<Security> Create(Security usersSecuredData)
+        public async Task<bool> Create(Security usersSecuredData)
         {
             return await _securityRepository.Create(usersSecuredData);
         }
